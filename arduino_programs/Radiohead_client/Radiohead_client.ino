@@ -1,28 +1,21 @@
 #include <RHReliableDatagram.h>
 #include <RH_RF95.h>
 #include <SPI.h>
-//#include <RHEncryptedDriver.h>
-//#include<Speck.h>
+#include <RHDatagram.h>
 
-#define CLIENT_ADDRESS 189                     //1
-#define SERVER_ADDRESS 2                   //2
+#define CLIENT_ADDRESS 1
+#define SERVER_ADDRESS 2
 #define freq 868.0
 
 RH_RF95 driver(10, 2);     //for arduino Mega
-//Speck myCipher;
-//RHEncryptedDriver myDriver(rf95, myCipher);
 
 // Class to manage message delivery and receipt, using the driver declared above
 RHReliableDatagram manager(driver, SERVER_ADDRESS);
-//unsigned char encryptkey[16]={1, 2, 3,4,5,6,7,8,9,10,11,12,13,14,15,16}
 
 void setup()
 {
   Serial.begin(9600);
   //SPI.setClockDivider(SPI_CLOCK_DIV2);
-  while(!Serial);
-  if(!manager.init())
-    Serial.println("init failed");
    /* RFM95 setup section */
   while (!Serial) ; // Wait for serial port to be available
   if (!manager.init())
@@ -37,14 +30,27 @@ void setup()
   
   // you can set transmitter powers from 5 to 23 dBm:
   driver.setTxPower(15, false);
-  //myCipher.setKey(encyptKey, sizeof(encryptkey));
-  
 }
 
-uint8_t buf1[] = "i am two";
+uint8_t buf1[5]; 
 uint8_t buf[RH_RF95_MAX_MESSAGE_LEN];
 void loop()
 {
+  buf1[0]=208;
+  buf1[1]=35;
+  buf1[2]=26;
+  buf1[3]=27;
+  buf1[4]=28;
+ // buf1[5]=29;
+//  buf1[6]=30;
+//  buf1[7]=21;
+//  buf1[8]=22;
+//  buf1[9]=23;
+//  buf1[10]=24;
+//  buf1[11]=25;
+//  buf1[12]=31;
+//  buf1[13]=32;
+//  buf1[14]=33;
   Serial.println("Sending to rf95_reliable_datagram_server");
    //delay(2000);
    if (manager.sendtoWait(buf1, sizeof(buf1), SERVER_ADDRESS))
@@ -71,5 +77,5 @@ void loop()
       {
           Serial.println("sendtoWait failed");
        }
-       delay(3000);
+       delay(1000);
 }
