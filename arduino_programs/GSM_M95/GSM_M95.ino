@@ -1,106 +1,66 @@
+#include <RTClib.h>
+
+#define BUFFER_SIZE 250 //Size of array in readStrings function
+#define input_time 30
+#define relayPin1 29
+
+RTC_DS1307 rtc;
+
+bool manual_val=0;
+char url[200];
+int soilMoist = 550;
+int hum = 65;
+int temp = 28;
+int soilTemp = 26;
+double battVolt = 3.7;
+char  GSM_string[250];
+char buff[50];
+bool pumpStat = 1;
+bool check_sms_flag = 0;
+bool check_net_flag = 0;
+bool check_status_flag = 0;
+bool check_number_flag = 0;
+bool check_timer_flag = 0;
+bool check_newnumber_flag = 0;
+bool timer_flag = 0;
+int sms_flag = 0;
+char pump[5] = {'O', 'F', 'F'};
+const long interval = 1000;
+char TIMER_string[250];
+char NUMBER_string[250];
+char mynumber[12] = "7066485916";
+char *ret;
+int mn = 0;
+
 void setup()
 {
   Serial.begin(9600);
   Serial1.begin(9600);
-  general_gsm();
-  Serial1.println("AT+CSCA?");                //SMS service center address 
-  delay(5000);
-  timeplease();
-  Serial1.println("AT+CPMS=?");              //To check SMS storage location
-  delay(5000);
-  timeplease();
-  Serial.println("");
-  delay(1000);
-//  Serial1.println("AT+CMGD=1, 2");                  //Delete all read SMS
-//  delay(5000);
-//  timeplease();
-//  Serial1.println("AT+CMGL=ALL");              //To List all SMS
-//  delay(5000);
-//  timeplease();
-//  Serial1.println("AT+CMGL=ALL");
-//  delay(200);
-//  timeplease();
-  Serial1.println("AT+CMGR=1");
-  timeplease();
-  Serial1.println("AT+CMGR=2");
-  timeplease();
-  Serial1.println("AT+CMGR=3");
-  timeplease();
-  Serial1.println("AT+CMGR=4");
-  timeplease();
-  Serial1.println("AT+CMGR=5");
-  timeplease();
-  Serial1.println("AT+CMGR=6");
-  timeplease();
-  Serial1.println("AT+CMGR=7");
-  timeplease();
-  Serial1.println("AT+CMGR=8");
-  timeplease();
-  Serial1.println("AT+CMGR=9");
-  timeplease();
-  Serial1.println("AT+CMGR=10");
-  timeplease();
-  Serial1.println("AT+CMGR=11");
-  timeplease();
-  Serial1.println("AT+CMGR=12");
-  timeplease();
-  Serial1.println("AT+CMGR=13");
-  timeplease();
-  Serial1.println("AT+CMGR=14");
-  timeplease();
-  Serial1.println("AT+CMGR=15");
-  timeplease();
-  Serial1.println("AT+CMGR=16");
-  timeplease();
-  
-//  Serial1.println("AT+CPMS='SM','SM','SM'");   //To set SIM storage for upcoming MSG
-//  delay(5000);
-//  timeplease();
-//send_sms();
+  Serial.println("hello");
 }
 void loop()
 {
-   if (Serial1.available() > 0)
-    {
-      Serial.write(Serial1.read());
-      //delay(1000);
-    }
-}
-void timeplease()
-{
-  for (int i = 0; i < 20000; i++)
+  if (sms_flag > 10)
   {
-    if (Serial1.available() > 0)
-    {
-      Serial.write(Serial1.read());
-      //delay(1000);
-    }
+    sms_to_farmer();
+    sms_flag = 0;
   }
+  sms_flag = sms_flag + 1;
+//  Serial.print(F("sms_flag is: "));
+//  Serial.println(sms_flag);
+    newnumber();
+      if (timer_flag == 1)
+      {
+        timerMode();
+      }
+  if (mn > 300)
+  {
+    gprs();
+    mn = 0;
+  }
+  //    gsm();
+  //Serial.print("value of mn is: ");
+  Serial.println(mn);
+  mn = mn + 1;
+  delay(1000);
 }
-void send_sms()
-{
-  Serial1.println("AT+CMGS=\"+917066485916\"\r");       //enter your mobile number
-  delay(1000);
-  timeplease();
-  Serial1.println("Baattery Low");        //content of SMS
-  delay(1000);
-  timeplease();
-  Serial1.println(char(26));           //end character Z
-  delay(1000);
-  timeplease();
-}
-
-void general_gsm()
-{
-  Serial1.println("AT");         //Test command
-  delay(1000);
-  timeplease();
-  Serial1.println("AT+CMGF=1");      //to anable GSM in Text mode
-  delay(1000);
-  timeplease();
-}
-void receive_sms()
-{
-
-}
-
