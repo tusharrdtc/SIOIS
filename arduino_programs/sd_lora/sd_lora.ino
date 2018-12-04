@@ -4,7 +4,7 @@
 #define BUFFER_SIZE 250
 
 #define freq 868.0
-#define sdcs 3
+#define sdcs 4
 #define input_time 30
 
 RH_RF95 rf95(53, 2);
